@@ -1,0 +1,99 @@
+<mxfile host="app.diagrams.net" modified="2026-09-25T00:00:00.000Z">
+  <diagram name="Investeeringud">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Portfolio -->
+        <mxCell id="portfolio"
+          value="&lt;b&gt;Portfolio&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Name : string"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="430" y="40" width="250" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- AssetClass -->
+        <mxCell id="assetclass"
+          value="&lt;b&gt;AssetClass&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Name : string"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="230" width="250" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Asset -->
+        <mxCell id="asset"
+          value="&lt;b&gt;Asset&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Name : string"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="390" y="230" width="250" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Transaction -->
+        <mxCell id="transaction"
+          value="&lt;b&gt;Transaction&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Date : DateTime&lt;br&gt;Amount : decimal&lt;br&gt;Type : string"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="720" y="220" width="260" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- MonthlyAsset -->
+        <mxCell id="monthlyasset"
+          value="&lt;b&gt;MonthlyAsset&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Year : int&lt;br&gt;Month : int&lt;br&gt;Quantity : decimal&lt;br&gt;Value : decimal"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="390" y="450" width="250" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- MonthlyPortfolio -->
+        <mxCell id="monthlyportfolio"
+          value="&lt;b&gt;MonthlyPortfolio&lt;/b&gt;&lt;hr&gt;Id : int&lt;br&gt;Year : int&lt;br&gt;Month : int&lt;br&gt;Value : decimal&lt;br&gt;ChangeFromPreviousMonth : decimal&lt;br&gt;ChangeFromStart : decimal"
+          style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;align=left;verticalAlign=top;spacing=8;fontSize=14;"
+          vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="280" height="180" as="geometry"/>
+        </mxCell>
+
+        <!-- Portfolio -> Asset -->
+        <mxCell id="edge1"
+          value="1 : *"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;fontSize=13;"
+          edge="1" parent="1" source="portfolio" target="asset">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- AssetClass -> Asset -->
+        <mxCell id="edge2"
+          value="1 : *"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;fontSize=13;"
+          edge="1" parent="1" source="assetclass" target="asset">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Asset -> MonthlyAsset -->
+        <mxCell id="edge3"
+          value="1 : *"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;fontSize=13;"
+          edge="1" parent="1" source="asset" target="monthlyasset">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Portfolio -> Transaction -->
+        <mxCell id="edge4"
+          value="1 : *"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;fontSize=13;"
+          edge="1" parent="1" source="portfolio" target="transaction">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Portfolio -> MonthlyPortfolio -->
+        <mxCell id="edge5"
+          value="1 : *"
+          style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;startArrow=none;fontSize=13;"
+          edge="1" parent="1" source="portfolio" target="monthlyportfolio">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
