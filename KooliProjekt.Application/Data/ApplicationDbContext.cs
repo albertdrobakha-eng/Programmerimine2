@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +12,13 @@ namespace KooliProjekt.Application.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+
+        public DbSet<Portfolio> Portfolios { get; set; }
+        public DbSet<AssetClass> AssetClasses { get; set; }
+        public DbSet<Asset> Assets { get; set; }
+        public DbSet<MonthlyValue> MonthlyValues { get; set; }
     }
 }
+
+
+
