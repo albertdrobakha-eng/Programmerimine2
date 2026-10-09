@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using KooliProjekt.Application.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace KooliProjekt.WebAPI
 {
@@ -40,6 +43,18 @@ namespace KooliProjekt.WebAPI
             });
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider
+                    .GetRequiredService<ApplicationDbContext>();
+
+                dbContext.Database.Migrate();
+
+#if DEBUG
+                SeedData.Generate(dbContext);
+#endif
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
