@@ -20,19 +20,14 @@ namespace KooliProjekt.WebAPI.Controllers
             }
 
             var result = await _mediator.Send(new GetPortfolioQuery { Id = id });
-            if (result == null)
-            {
-                return NotFound();
-            }
-
-            return Json(result);
+            return Result(result);
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(int page = 1, int pageSize = 10)
         {
-            var result = await _mediator.Send(new ListPortfoliosQuery());
-            return Json(result);
+            var result = await _mediator.Send(new ListPortfoliosQuery { Page = page, PageSize = pageSize });
+            return Result(result);
         }
     }
 }

@@ -1,10 +1,13 @@
-using System.Collections.Generic;
-using KooliProjekt.Application.Data;
+using KooliProjekt.Application.Dto;
+using KooliProjekt.Application.Infrastructure.Paging;
+using KooliProjekt.Application.Infrastructure.Results;
 using MediatR;
 
 namespace KooliProjekt.Application.Features.Portfolios
 {
-    public class ListPortfoliosQuery : IRequest<IEnumerable<Portfolio>>
+    public class ListPortfoliosQuery : IRequest<OperationResult<PagedResult<PortfolioDto>>>
     {
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
     }
 }
