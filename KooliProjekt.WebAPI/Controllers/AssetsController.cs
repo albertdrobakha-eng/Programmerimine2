@@ -29,5 +29,11 @@ namespace KooliProjekt.WebAPI.Controllers
             var result = await _mediator.Send(new ListAssetsQuery { Page = page, PageSize = pageSize });
             return Result(result);
         }
+
+        [HttpPost("save")]
+        public async Task<IActionResult> Save([FromBody] SaveAssetCommand command) => Result(await _mediator.Send(command));
+
+        [HttpDelete("delete")]
+        public async Task<IActionResult> Delete([FromBody] DeleteAssetCommand command) => Result(await _mediator.Send(command));
     }
 }

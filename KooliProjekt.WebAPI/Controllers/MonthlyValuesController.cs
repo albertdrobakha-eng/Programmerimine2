@@ -29,5 +29,11 @@ namespace KooliProjekt.WebAPI.Controllers
             var result = await _mediator.Send(new ListMonthlyValuesQuery { Page = page, PageSize = pageSize });
             return Result(result);
         }
+
+        [HttpPost("save")]
+        public async Task<IActionResult> Save([FromBody] SaveMonthlyValueCommand command) => Result(await _mediator.Send(command));
+
+        [HttpDelete("delete")]
+        public async Task<IActionResult> Delete([FromBody] DeleteMonthlyValueCommand command) => Result(await _mediator.Send(command));
     }
 }
