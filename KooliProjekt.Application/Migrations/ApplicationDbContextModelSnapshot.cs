@@ -126,6 +126,18 @@ namespace KooliProjekt.Application.Migrations
                     b.ToTable("Portfolios");
                 });
 
+            modelBuilder.Entity("KooliProjekt.Application.Data.User", b =>
+                {
+                    b.Property<int>("Id").ValueGeneratedOnAdd().HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<bool>("IsAdmin").HasColumnType("bit");
+                    b.Property<string>("PasswordHash").IsRequired().HasMaxLength(255).HasColumnType("nvarchar(255)");
+                    b.Property<string>("UserName").IsRequired().HasMaxLength(25).HasColumnType("nvarchar(25)");
+                    b.HasKey("Id");
+                    b.HasIndex("UserName").IsUnique();
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("KooliProjekt.Application.Data.Asset", b =>
                 {
                     b.HasOne("KooliProjekt.Application.Data.AssetClass", "AssetClass")

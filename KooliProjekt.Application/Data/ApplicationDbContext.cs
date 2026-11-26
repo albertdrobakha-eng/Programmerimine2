@@ -17,6 +17,7 @@ namespace KooliProjekt.Application.Data
         public DbSet<AssetClass> AssetClasses { get; set; }
         public DbSet<Asset> Assets { get; set; }
         public DbSet<MonthlyValue> MonthlyValues { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
 

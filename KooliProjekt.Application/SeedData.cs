@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using KooliProjekt.Application.Authentication;
 
 namespace KooliProjekt.Application.Data
 {
@@ -8,6 +9,18 @@ namespace KooliProjekt.Application.Data
     {
         public static void Generate(ApplicationDbContext context)
         {
+            if (!context.Users.Any(user => user.UserName == "admin"))
+            {
+                context.Users.Add(new User { UserName = "admin", PasswordHash = PasswordHelper.Hash("Admin123!"), IsAdmin = true });
+                context.SaveChanges();
+            }
+
+            if (!context.Users.Any(user => user.UserName == "user"))
+            {
+                context.Users.Add(new User { UserName = "user", PasswordHash = PasswordHelper.Hash("User123!"), IsAdmin = false });
+                context.SaveChanges();
+            }
+
             if (!context.Portfolios.Any())
             {
                 SeedPortfolios(context);

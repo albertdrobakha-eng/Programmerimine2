@@ -1,12 +1,17 @@
 using FluentValidation;
+using System.Text;
+using KooliProjekt.Application.Authentication.Jwt;
 using KooliProjekt.Application.Behaviors;
 using KooliProjekt.Application.Data;
 using KooliProjekt.Application.Infrastructure.Files;
+using KooliProjekt.Application.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System.IO;
 using System;
 
@@ -28,6 +33,33 @@ namespace KooliProjekt.WebAPI
             });
 
             builder.Services.AddControllers();
+            builder.Services.AddHttpContextAccessor();
+            var jwtSettings = new JwtSettings(builder.Configuration);
+            var jwtKey = Encoding.UTF8.GetBytes(jwtSettings.Key);
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+            builder.Services.AddSingleton(jwtSettings);
+            builder.Services.AddSingleton<JwtTokenBuilder>();
+            builder.Services.AddScoped<IUserProvider, WebUserProvider>();
+            builder.Services.AddAuthorization();
             var filesRoot = builder.Configuration["FilesRoot"];
             if (string.IsNullOrWhiteSpace(filesRoot)) filesRoot = Path.Combine(builder.Environment.ContentRootPath, "Files");
             else if (!Path.IsPathRooted(filesRoot)) filesRoot = Path.Combine(builder.Environment.ContentRootPath, filesRoot);
@@ -67,6 +99,7 @@ namespace KooliProjekt.WebAPI
                 app.UseSwaggerUI();
             }
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
