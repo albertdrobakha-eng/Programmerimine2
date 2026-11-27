@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using KooliProjekt.Application.Data;
@@ -14,7 +15,7 @@ namespace KooliProjekt.Application.Features.Portfolios
   {
    var result = new OperationResult();
    Portfolio item;
-   if (request.Id == 0) { item = new Portfolio(); _dbContext.Portfolios.Add(item); }
+   if (request.Id == 0) { item = new Portfolio(); item.OwnerId = await _dbContext.Users.Where(x => x.IsAdmin).Select(x => (int?)x.Id).FirstOrDefaultAsync(cancellationToken); _dbContext.Portfolios.Add(item); }
    else { item = await _dbContext.Portfolios.FindAsync(new object[] { request.Id }, cancellationToken); if (item == null) return result.AddPropertyError(nameof(request.Id), "Portfolio was not found."); }
    item.Name = request.Name;
    await _dbContext.SaveChangesAsync(cancellationToken);

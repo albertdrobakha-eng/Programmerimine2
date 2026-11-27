@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,5 +16,7 @@ namespace KooliProjekt.Application.Data
         public string PasswordHash { get; set; }
 
         public bool IsAdmin { get; set; }
+
+        public ICollection<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
     }
 }

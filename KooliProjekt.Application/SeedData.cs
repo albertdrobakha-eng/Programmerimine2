@@ -14,13 +14,17 @@ namespace KooliProjekt.Application.Data
                 context.Users.Add(new User { UserName = "admin", PasswordHash = PasswordHelper.Hash("Admin123!"), IsAdmin = true });
                 context.SaveChanges();
             }
-
             if (!context.Users.Any(user => user.UserName == "user"))
             {
                 context.Users.Add(new User { UserName = "user", PasswordHash = PasswordHelper.Hash("User123!"), IsAdmin = false });
                 context.SaveChanges();
             }
-
+            var adminId = context.Users.Where(x => x.IsAdmin).Select(x => x.Id).First();
+            var userId = context.Users.Where(x => x.UserName == "user").Select(x => x.Id).First();
+            var demoPortfolios = context.Portfolios.OrderBy(x => x.Id).Take(35).ToList();
+            for (var i = 0; i < demoPortfolios.Count; i++) demoPortfolios[i].OwnerId = (i % 2 == 0) ? adminId : userId;
+            foreach (var portfolio in context.Portfolios.Where(x => x.OwnerId == null)) portfolio.OwnerId = adminId;
+            context.SaveChanges();
             if (!context.Portfolios.Any())
             {
                 SeedPortfolios(context);
@@ -83,6 +87,8 @@ namespace KooliProjekt.Application.Data
                 new Portfolio { Name = "World Markets" }
             };
 
+            var ownerIds = context.Users.OrderBy(x => x.Id).Select(x => x.Id).ToArray();
+            for (var i = 0; i < portfolios.Count; i++) portfolios[i].OwnerId = ownerIds[i % ownerIds.Length];
             context.Portfolios.AddRange(portfolios);
             context.SaveChanges();
         }

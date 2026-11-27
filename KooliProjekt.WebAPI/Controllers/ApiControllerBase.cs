@@ -1,4 +1,4 @@
-﻿using KooliProjekt.Application.Infrastructure.Results;
+using KooliProjekt.Application.Infrastructure.Results;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
@@ -6,6 +6,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace KooliProjekt.WebAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]    
@@ -24,10 +25,10 @@ namespace KooliProjekt.WebAPI.Controllers
 
             if (result.HasErrors)
             {
-                return BadRequest(serialized);
+                return Content(serialized, "application/json", System.Text.Encoding.UTF8);
             }
 
-            return Ok(serialized);
+            return Content(serialized, "application/json", System.Text.Encoding.UTF8);
         }
 
         protected IActionResult Result<T>(OperationResult<T> result)
@@ -36,7 +37,7 @@ namespace KooliProjekt.WebAPI.Controllers
 
             if (result.HasErrors)
             {
-                return BadRequest(serialized);
+                return Content(serialized, "application/json", System.Text.Encoding.UTF8);
             }
 
             if (result.Value == null)
@@ -44,7 +45,7 @@ namespace KooliProjekt.WebAPI.Controllers
                 return NotFound();
             }
 
-            return Ok(serialized);
+            return Content(serialized, "application/json", System.Text.Encoding.UTF8);
         }
     }
 }

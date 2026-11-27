@@ -7,7 +7,7 @@ using System.IO;
 
 namespace KooliProjekt.WebAPI.Controllers
 {
-    public class AssetsController : ApiControllerBase
+    public class AssetsController : AdminApiControllerBase
     {
         private readonly IMediator _mediator;
 

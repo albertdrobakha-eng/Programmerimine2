@@ -1,20 +1,20 @@
-using FluentValidation;
+using System;
+using System.IO;
 using System.Text;
 using KooliProjekt.Application.Authentication.Jwt;
 using KooliProjekt.Application.Behaviors;
 using KooliProjekt.Application.Data;
-using KooliProjekt.Application.Infrastructure.Files;
 using KooliProjekt.Application.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using KooliProjekt.Application.Infrastructure.Files;
+using KooliProjekt.WebAPI.Authentication;
+using FluentValidation;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System.IO;
-using System;
-
 namespace KooliProjekt.WebAPI
 {
     public class Program
@@ -22,52 +22,29 @@ namespace KooliProjekt.WebAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-            // Add services to the container.
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseSqlServer(connectionString);
-            });
-
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddControllers();
             builder.Services.AddHttpContextAccessor();
+
+            var configuredKey = builder.Configuration["Jwt:Key"];
+            if (string.IsNullOrWhiteSpace(configuredKey) && builder.Environment.IsDevelopment())
+                configuredKey = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(48));
+            if (string.IsNullOrWhiteSpace(configuredKey)) throw new InvalidOperationException("Configure Jwt:Key using a secure environment setting.");
+            builder.Configuration["Jwt:Key"] = configuredKey;
             var jwtSettings = new JwtSettings(builder.Configuration);
-            var jwtKey = Encoding.UTF8.GetBytes(jwtSettings.Key);
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings.Audience,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
             builder.Services.AddSingleton(jwtSettings);
             builder.Services.AddSingleton<JwtTokenBuilder>();
             builder.Services.AddScoped<IUserProvider, WebUserProvider>();
+            builder.Services.AddAuthentication("Bearer").AddScheme<AuthenticationSchemeOptions, JwtAuthenticationHandler>("Bearer", _ => { });
             builder.Services.AddAuthorization();
+
             var filesRoot = builder.Configuration["FilesRoot"];
             if (string.IsNullOrWhiteSpace(filesRoot)) filesRoot = Path.Combine(builder.Environment.ContentRootPath, "Files");
             else if (!Path.IsPathRooted(filesRoot)) filesRoot = Path.Combine(builder.Environment.ContentRootPath, filesRoot);
             builder.Services.AddSingleton<IFileClient>(new LocalFileClient(filesRoot));
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
             var applicationAssembly = typeof(ErrorHandlingBehavior<,>).Assembly;
             builder.Services.AddValidatorsFromAssembly(applicationAssembly);
             builder.Services.AddMediatR(config =>
@@ -77,34 +54,19 @@ namespace KooliProjekt.WebAPI
                 config.AddOpenBehavior(typeof(ValidationBehavior<,>));
                 config.AddOpenBehavior(typeof(TransactionalBehavior<,>));
             });
-
             var app = builder.Build();
-
             using (var scope = app.Services.CreateScope())
             {
-                var dbContext = scope.ServiceProvider
-                    .GetRequiredService<ApplicationDbContext>();
-
-                dbContext.Database.Migrate();
-
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
 #if DEBUG
-                SeedData.Generate(dbContext);
+                SeedData.Generate(db);
 #endif
             }
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
+            if (app.Environment.IsDevelopment()) { app.UseSwagger(); app.UseSwaggerUI(); }
             app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

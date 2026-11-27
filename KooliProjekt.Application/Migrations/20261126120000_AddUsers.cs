@@ -1,9 +1,7 @@
 using KooliProjekt.Application.Data;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
-
 #nullable disable
-
 namespace KooliProjekt.Application.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
@@ -12,20 +10,23 @@ namespace KooliProjekt.Application.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false).Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    IsAdmin = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table => table.PrimaryKey("PK_Users", x => x.Id));
-
-            migrationBuilder.CreateIndex(name: "IX_Users_UserName", table: "Users", column: "UserName", unique: true);
+            migrationBuilder.Sql(@"
+IF OBJECT_ID(N'[Users]', N'U') IS NULL
+BEGIN
+    CREATE TABLE [Users] (
+        [Id] int NOT NULL IDENTITY(1,1),
+        [UserName] nvarchar(25) NOT NULL,
+        [PasswordHash] nvarchar(255) NOT NULL,
+        [IsAdmin] bit NOT NULL,
+        CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
+    );
+END;
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Users_UserName' AND object_id = OBJECT_ID(N'[Users]'))
+    CREATE UNIQUE INDEX [IX_Users_UserName] ON [Users] ([UserName]);
+");
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder) => migrationBuilder.DropTable(name: "Users");
+        // User records must not be dropped automatically when rolling back this migration.
+        protected override void Down(MigrationBuilder migrationBuilder) { }
     }
 }

@@ -36,7 +36,8 @@ namespace KooliProjekt.Application.Features.Authentication
             var claims = new System.Collections.Generic.List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.IsAdmin ? "Admin" : "User")
             };
             if (user.IsAdmin) claims.Add(new Claim(ClaimTypes.Role, "Admin"));
             result.Value = _tokenBuilder.GenerateToken(claims.ToArray());
